@@ -15,10 +15,7 @@ const getStateDistricts = async (req, res) => {
       {
         $addFields: {
           isStartsWithQuery: {
-            $eq: [
-              { $substrCP: ["$districts.name", 0, query.length] },
-              query,
-            ],
+            $eq: [{ $substrCP: ["$districts.name", 0, query.length] }, query],
           },
         },
       },
@@ -28,7 +25,7 @@ const getStateDistricts = async (req, res) => {
         },
       },
       {
-        $limit: 10, // Limit after sorting
+        $limit: 10,
       },
       {
         $group: {
@@ -56,7 +53,6 @@ const getStateDistricts = async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 };
-
 
 const createStateDistrict = async (req, res) => {
   // console.log(req.body);
