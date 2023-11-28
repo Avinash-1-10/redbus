@@ -1,4 +1,5 @@
 const StateDistrict = require("../models/stateDistrict");
+const mongoose  = require("mongoose")
 
 const getStateDistricts = async (req, res) => {
   const { query } = req.query;
@@ -46,13 +47,13 @@ const getStateDistricts = async (req, res) => {
         },
       },
     ]);
-
     res.json(matchingDistricts[0]?.districts || []);
   } catch (error) {
     console.error(error);
     res.status(500).send("Internal Server Error");
   }
 };
+
 
 const createStateDistrict = async (req, res) => {
   // console.log(req.body);
@@ -66,7 +67,35 @@ const createStateDistrict = async (req, res) => {
   }
 };
 
+
+
+const getDistrict = async (req, res) => {
+
+  try {
+    const { id } = req.query;
+
+    // Using async/await with a more expressive variable name
+    const stateDistrict = await StateDistrict.findOne({ "districts._id": id }, { 'districts.$': 1 });
+
+    // Checking if the result exists before accessing its properties
+    if (stateDistrict && stateDistrict.districts && stateDistrict.districts.length > 0) {
+      const district = stateDistrict.districts[0];
+      res.json(district);
+    } else {
+      // Handle the case where the district with the given ID is not found
+      res.status(404).json({ error: 'District not found' });
+    }
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+
+
 module.exports = {
   getStateDistricts,
+  getDistrict,
   createStateDistrict,
 };

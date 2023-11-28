@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaArrowRight } from "react-icons/fa6";
-import { BsSearch } from "react-icons/bs";
-import { SlCalender } from "react-icons/sl";
+import { BsSearch, BsCalendar } from "react-icons/bs";
 import axios from "axios";
 import { debounce } from "lodash";
 import { useNavigate } from "react-router-dom";
+import Calendar from "react-calendar";
+import "react-calendar/dist/Calendar.css";
 
 const SearchTrip = ({ setFilters }) => {
   const navigate = useNavigate();
@@ -15,6 +16,15 @@ const SearchTrip = ({ setFilters }) => {
   const [toSuggestions, setToSuggestions] = useState([]);
   const [fromSuggestionsVisible, setFromSuggestionsVisible] = useState(true);
   const [toSuggestionsVisible, setToSuggestionsVisible] = useState(true);
+  const [calendarVisible, setCalendarVisible] = useState(false);
+
+  useEffect(() => {
+    const today = new Date();
+    const todayFormatted = `${today.getFullYear()}-${
+      today.getMonth() + 1
+    }-${today.getDate()}`;
+    setDate(todayFormatted);
+  }, []);
 
   const debouncedSearch = debounce(async (input, setSuggestions) => {
     try {
@@ -26,7 +36,7 @@ const SearchTrip = ({ setFilters }) => {
     } catch (error) {
       console.error("Error fetching suggestions", error);
     }
-  }, 300); 
+  }, 300);
 
   const handleInputChange = (
     inputValue,
@@ -52,9 +62,20 @@ const SearchTrip = ({ setFilters }) => {
   };
 
   const handleSearch = () => {
-    setFilters((prev) => ({ ...prev, from, to }));
+    setFilters((prev) => ({ ...prev, from, to, date }));
     navigate("/trips");
   };
+
+  const handleCalendarChange = (selectedDate) => {
+    const day = selectedDate.getDate();
+    const month = selectedDate.getMonth() + 1;
+    const year = selectedDate.getFullYear();
+    const date = `${year}-${month}-${day}`;
+    setDate(date);
+    setCalendarVisible(false);
+  };
+
+  
 
   return (
     <div className="border max-w-fit h-[60px] my-5 rounded-lg flex justify-between items-center p-10 shadow-lg bg-white gap-10 relative">
@@ -111,7 +132,7 @@ const SearchTrip = ({ setFilters }) => {
         onBlur={() => setToSuggestionsVisible(false)}
       />
       {toSuggestionsVisible && toSuggestions.length > 0 && (
-        <div className="absolute top-[70px] left-[340px] flex flex-col gap-3 border bg-white w-[200px] p-5 h-[250px] overflow-scroll rounded-md">
+        <div className="absolute top-[70px] left-[340px] flex flex-col gap-3 border bg-white w-[200px] p-5 max-h-[250px] overflow-scroll rounded-md">
           {toSuggestions.map((suggestion, index) => (
             <span
               key={index}
@@ -131,18 +152,27 @@ const SearchTrip = ({ setFilters }) => {
           ))}
         </div>
       )}
-      <div className="border flex h-[45px] items-center gap-2 pl-2 rounded-md w-[150px]">
-        <SlCalender className="text-[25px]" />
-        <input
-          type="text"
-          className="h-full w-full outline-none"
-          placeholder="22/11/2023"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
+      <div className="border flex h-[45px] items-center gap-2 pl-2 rounded-md w-[150px] relative">
+        <BsCalendar
+          className="text-[25px] cursor-pointer"
+          onClick={() => setCalendarVisible(!calendarVisible)}
         />
+        <span>{date}</span>
+        {calendarVisible && (
+          <div className="absolute top-[50px] rigt-0">
+            <Calendar
+              onChange={handleCalendarChange}
+              value={date}
+              style={{ width: "250px" }}
+            />
+          </div>
+        )}
       </div>
-      <div className="border p-2 bg-blue-500 rounded-lg ">
-        <BsSearch className=" text-[25px] text-white cursor-pointer" onClick={handleSearch} />
+      <div className="border p-2 bg-blue-500 rounded-lg">
+        <BsSearch
+          className="text-[25px] text-white cursor-pointer"
+          onClick={handleSearch}
+        />
       </div>
     </div>
   );

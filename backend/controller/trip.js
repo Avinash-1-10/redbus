@@ -1,7 +1,15 @@
+const BusOwner = require("../models/busOwner");
 const StateDistrict = require("../models/stateDistrict");
 const Trip = require("../models/trip");
 
+
+
+  
+
+
+
 const getTrips = async (req, res) => {
+
   const { date, rating, from, to } = req.query;
   console.log(req.params);
 
@@ -9,7 +17,7 @@ const getTrips = async (req, res) => {
     const filter = {};
 
     if (date) {
-      filter.date = Date.parse(date);
+      filter.startDate = Date.parse(date);
     }
 
     if (rating) {
@@ -59,8 +67,41 @@ const getTrips = async (req, res) => {
 };
 
 const createTrip = async (req, res) => {
+  const {
+    startDate,
+    endDate,
+    from,
+    to,
+    busOwnerID,
+    arrivalTime,
+    departureTime,
+    bookedSeats,
+    busFare,
+  } = req.body;
+
   try {
-    const trip = await Trip.create(req.body);
+    const busOwner = await BusOwner.findById(busOwnerID);
+    if (!busOwner) {
+      return res.status(404).json({ message: "Bus Owner not found" });
+    }
+
+    const trip = await Trip.create({
+      startDate,
+      endDate,
+      from,
+      to,
+      arrivalTime,
+      departureTime,
+      bookedSeats,
+      busFare,
+      busOwnerID,
+      operator: busOwner.name,
+      category: busOwner.category,
+      bus_no: busOwner.busNo,
+      amenities_list: busOwner.amenities,
+      rating: busOwner.rating,
+    });
+
     res.status(201).json(trip);
   } catch (error) {
     console.error("Error:", error.message);
