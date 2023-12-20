@@ -1,12 +1,29 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { loadStripe } from "@stripe/stripe-js";
+import { addTicket } from "../redux/actionCreators/ticket";
+import axios from "axios";
+import useDistrict from "../hooks/UseDistrict";
 
 const PassengerInfo = () => {
-  // Array of booked seats
-  let yourbookedSeats = ["L12", "L23", "U12", "U15", "L25"];
+  const dispatch = useDispatch();
+  const ticket = useSelector((state) => state.ticket);
+  // console.log("Ticket:", ticket);
+  // console.log(ticket.yourbookedSeats);
+  const [baseUrl, setBaseUrl] = useState("");
+  const from = useDistrict(ticket.from);
+  const to = useDistrict(ticket.to);
+
+  useEffect(() => {
+    const url = window.location.origin;
+    setBaseUrl(url);
+    console.log("Base URL:", url);
+  }, []);
+  console.log(baseUrl);
 
   // State to store passenger data for each booked seat
   const [passengerData, setPassengerData] = useState(
-    yourbookedSeats.map((seat) => ({
+    ticket.yourbookedSeats.map((seat) => ({
       seat,
       name: "",
       gender: "",
@@ -18,12 +35,10 @@ const PassengerInfo = () => {
   console.log(passengerData);
 
   // State for payment details
-  const [paymentData, setPaymentData] = useState({
-    baseFare: 700,
-    tax: 700,
-    offerApplied: 0,
-    totalAmount: 700,
-  });
+  let busFare = ticket.busFare * ticket.yourbookedSeats.length;
+  let tax = (busFare * 10) / 100;
+  let discount = (busFare * 20) / 100;
+  let totalPrice = busFare + tax - discount;
 
   // Function to handle passenger input changes and update state
   const handleInputChange = (index, field, value) => {
@@ -32,21 +47,52 @@ const PassengerInfo = () => {
     setPassengerData(updatedPassengerData);
   };
 
-  // Function to handle payment input changes and update state
-  const handlePaymentInputChange = (field, value) => {
-    setPaymentData((prevData) => ({
-      ...prevData,
-      [field]: value,
-    }));
-  };
+  const makePayment = async () => {
+    dispatch(addTicket({ totalPrice, passengerInfo: passengerData }));
 
+    try {
+      const stripe = await loadStripe(
+        "pk_test_51OImwQSBthM8UWJybUFRcAkPAk2xLFXlGKHSAMgnfmlu7KgXgfqPyKCty2muRwFbAFyPpHLwNniIZK45yqkVhjZn00qyBFFOqY"
+      );
+
+      if (!stripe) {
+        console.error("Stripe is not loaded properly");
+        return;
+      }
+
+      const body = {
+        totalPrice: ticket.totalPrice,
+        from,
+        to,
+        success: `${baseUrl}/success`,
+        fail: `${baseUrl}/fail`,
+      };
+
+      const response = await axios.post(
+        "http://localhost:4000/api/payment/create-checkout-session",
+        body
+      );
+
+      const session = response.data;
+
+      const result = await stripe.redirectToCheckout({
+        sessionId: session.id,
+      });
+
+      if (result.error) {
+        console.log(result.error);
+      }
+    } catch (error) {
+      console.error("Error during payment:", error);
+    }
+  };
   return (
     <div className="flex justify-between p-4 bg-gray-100 w-full px-20">
       {/* Passenger details */}
       <div className="w-[65%] p-6 bg-white rounded-lg shadow-md flex flex-col gap-5 overflow-y-scroll h-screen">
         <h1 className="text-[30px]">Passenger Details</h1>
         <hr />
-        {yourbookedSeats.map((user, index) => (
+        {ticket.yourbookedSeats.map((user, index) => (
           <div key={index} className="mb-6">
             <h2 className="text-xl font-semibold mb-2">
               Passenger {index + 1}{" "}
@@ -154,30 +200,29 @@ const PassengerInfo = () => {
         <h2 className="text-xl font-semibold mb-4">Fare Details</h2>
         <div className="mb-4 flex justify-between">
           <p className="text-gray-600">Base Fare</p>
-          <span className="font-semibold text-lg">
-            INR {paymentData.baseFare}
-          </span>
+          <span className="font-semibold text-lg">INR {busFare}</span>
         </div>
         <div className="mb-4 flex justify-between">
           <p className="text-gray-600">Tax</p>
-          <span className="font-semibold text-lg">INR {paymentData.tax}</span>
+          <span className="font-semibold text-lg">INR {tax}</span>
         </div>
         <div className="mb-4 flex justify-between">
           <p className="text-gray-600">Offer Applied</p>
-          <span className="font-semibold text-lg">
-            INR {paymentData.offerApplied}
-          </span>
+          <span className="font-semibold text-lg">INR {discount}</span>
         </div>
         <hr className="my-4" />
         <div className="mb-4 flex justify-between">
           <p className="text-xl font-semibold">Total Price</p>
           <span className="text-2xl font-semibold text-blue-500">
-            INR {paymentData.totalAmount}
+            INR {totalPrice}
           </span>
         </div>
         {/* Payment details input fields */}
         <div className="flex justify-center items-center w-full">
-          <button className="bg-blue-500 text-white py-2 px-4 rounded-full hover:bg-blue-600 focus:outline-none">
+          <button
+            className="bg-blue-500 text-white py-2 px-4 rounded-full hover:bg-blue-600 focus:outline-none"
+            onClick={makePayment}
+          >
             Proceed to Payment
           </button>
         </div>

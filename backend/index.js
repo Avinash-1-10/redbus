@@ -5,6 +5,7 @@ const dotenv = require("dotenv");
 const stateDistrictRouter = require("./routes/stateDistrict.js");
 const tripRouter = require("./routes/trip.js")
 const ticketRouter = require("./routes/ticket.js")
+const paymentRouter = require("./routes/payment.js")
 dotenv.config()
 
 
@@ -29,6 +30,7 @@ app.use(express.json());
 app.use("/api/state_districts", stateDistrictRouter);
 app.use("/api/trips", tripRouter)
 app.use("/api/tickets", ticketRouter)
+app.use("/api/payment", paymentRouter)
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

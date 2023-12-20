@@ -2,16 +2,9 @@ const BusOwner = require("../models/busOwner");
 const StateDistrict = require("../models/stateDistrict");
 const Trip = require("../models/trip");
 
-
-
-  
-
-
-
 const getTrips = async (req, res) => {
-
-  const { date, rating, from, to } = req.query;
-  console.log(req.params);
+  const { date, rating, from, to, arrivalSessions, departureSessions } = req.query;
+  console.log(rating)
 
   try {
     const filter = {};
@@ -21,8 +14,60 @@ const getTrips = async (req, res) => {
     }
 
     if (rating) {
-      filter.rating = { $gte: +rating };
+      const numericRating = +rating;
+
+      if (numericRating >= 0 && numericRating < 2) {
+        filter.rating = { $gte: 0, $lt: 2 };
+      } else if (numericRating >= 2 && numericRating < 4) {
+        filter.rating = { $gte: 2, $lt: 4 };
+      } else if (numericRating >= 4 && numericRating <= 5) {
+        filter.rating = { $gte: 4, $lte: 5 };
+      } else {
+        console.log('Invalid rating range');
+      }
     }
+    if (arrivalSessions && arrivalSessions.length > 0) {
+      // Add a filter based on multiple arrival sessions
+      const arrivalTimeFilters = arrivalSessions.map(session => {
+        const currentDate = new Date();
+        switch (session.toLowerCase()) {
+          case 'morning':
+            return { arrivalTime: { $gte: new Date(currentDate.setHours(6, 0, 0)), $lt: new Date(currentDate.setHours(12, 0, 0)) } };
+          case 'afternoon':
+            return { arrivalTime: { $gte: new Date(currentDate.setHours(12, 0, 0)), $lt: new Date(currentDate.setHours(18, 0, 0)) } };
+          case 'evening':
+            return { arrivalTime: { $gte: new Date(currentDate.setHours(18, 0, 0)), $lt: new Date(currentDate.setHours(24, 0, 0)) } };
+          default:
+            console.log('Invalid arrival session:', session);
+            return null;
+        }
+      });
+
+      // Merge multiple arrival time filters using $or
+      filter.$or = arrivalTimeFilters.filter(Boolean);
+    }
+
+    if (departureSessions && departureSessions.length > 0) {
+      // Add a filter based on multiple departure sessions
+      const departureTimeFilters = departureSessions.map(session => {
+        const currentDate = new Date();
+        switch (session.toLowerCase()) {
+          case 'morning':
+            return { departureTime: { $gte: new Date(currentDate.setHours(6, 0, 0)), $lt: new Date(currentDate.setHours(12, 0, 0)) } };
+          case 'afternoon':
+            return { departureTime: { $gte: new Date(currentDate.setHours(12, 0, 0)), $lt: new Date(currentDate.setHours(18, 0, 0)) } };
+          case 'evening':
+            return { departureTime: { $gte: new Date(currentDate.setHours(18, 0, 0)), $lt: new Date(currentDate.setHours(24, 0, 0)) } };
+          default:
+            console.log('Invalid departure session:', session);
+            return null;
+        }
+      });
+
+      // Merge multiple departure time filters using $or
+      filter.$or = (filter.$or || []).concat(departureTimeFilters.filter(Boolean));
+    }
+
 
     if (from) {
       const fromDistrict = await StateDistrict.findOne(

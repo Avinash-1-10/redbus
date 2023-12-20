@@ -1,27 +1,19 @@
-import axios from "axios";
-import React, { useEffect, useState } from "react";
+// components/Trips.js
+
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import Filters from "../components/Filters";
 import AllTrips from "../components/AllTrips";
+import { fetchTrips } from "../redux/actionCreators/trip";
 
-const Trips = ({ filters }) => {
-  const [trips, setTrips] = useState([]);
-
-  const apiCall = async () => {
-    try {
-      const response = await axios.get("http://localhost:4000/api/trips", {
-        params: filters,
-      });
-      const data = response.data;
-      setTrips(data);
-      console.log(data);
-    } catch (error) {
-      console.error("Error fetching trips", error);
-    }
-  };
+const Trips = () => {
+  const dispatch = useDispatch();
+  const filter = useSelector((state) => state.filter);
+  const trips = useSelector((state) => state.trips.trips);
 
   useEffect(() => {
-    apiCall();
-  }, [filters]);
+    dispatch(fetchTrips());
+  }, [dispatch, filter]);
 
   return (
     <div className="px-[25px] my-[20px] w-full flex justify-between">
@@ -29,7 +21,7 @@ const Trips = ({ filters }) => {
         <Filters />
       </div>
       <div className="w-[75%]">
-        <AllTrips trips={trips}/>
+        <AllTrips trips={trips} />
       </div>
     </div>
   );

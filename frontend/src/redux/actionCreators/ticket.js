@@ -1,9 +1,9 @@
 import { ADD_TICKET, REMOVE_TICKET } from "../actionType";
 
-const addTicket = (ticket) => {
+const addTicket = (ticketInfo) => {
   return {
     type: ADD_TICKET,
-    payload: ticket,
+    payload: ticketInfo,
   };
 };
 

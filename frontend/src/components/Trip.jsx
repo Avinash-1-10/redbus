@@ -116,7 +116,7 @@ const Trip = ({ trip }) => {
           </button>
         </div>
       </div>
-      {viewSeats && <Seats bookedSeats={bookedSeats} />}
+      {viewSeats && <Seats bookedSeats={bookedSeats} trip={trip} />}
     </div>
   );
 };

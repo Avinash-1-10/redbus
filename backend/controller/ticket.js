@@ -3,29 +3,31 @@ const Trip = require("../models/trip");
 
 const saveTicket = async (req, res) => {
   try {
-    const { name, gender, email, phone, tripID } = req.body;
-    console.log(req.body);
+    const { passengerInfo, tripID, totalPrice, seats } = req.body;
 
+    // Fetch the trip details
     const trip = await Trip.findById(tripID);
     if (!trip) {
       return res.status(404).json({ message: "Trip not found" });
     }
 
+
     const ticketData = {
-      name,
-      gender,
-      email,
-      phone,
+      passengerInfo,
       tripID,
       from: trip.from,
       to: trip.to,
+      seats,
       busFare: trip.busFare,
       busOwnerID: trip.busOwnerID,
       bus_no: trip.bus_no,
-      startTime: trip.startTime,
-      endTime: trip.endTime,
+      departureTime: trip.departureTime,
+      arrivalTime: trip.arrivalTime,
+      operator: trip.operator,
+      totalPrice,
     };
-
+    console.log(ticketData)
+    // Create the ticket
     const doc = await Ticket.create(ticketData);
 
     res.status(201).json(doc);
@@ -35,3 +37,4 @@ const saveTicket = async (req, res) => {
 };
 
 module.exports = { saveTicket };
+

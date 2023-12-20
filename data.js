@@ -117,15 +117,18 @@
 
 
 // Specify the date in the format "YYYY-MM-DD"
-const dateString = "2023-11-2";
+// const dateString = "2023-11-2";
 
-// Get the timestamp for the specified date
-const timestamp = Date.parse(dateString);
+// // Get the timestamp for the specified date
+// const timestamp = Date.parse(dateString);
 
-console.log(timestamp);
-const date = new Date(1700784000000)
-console.log(date.toLocaleDateString("ind"))
-// let d = new Date(1698105600000);
-// let d1 = new Date(1698105600000);
-// console.log(d.toDateString())
+// console.log(timestamp);
+// const date = new Date(1700784000000)
+// console.log(date.toLocaleDateString("ind"))
+// // let d = new Date(1698105600000);
+// // let d1 = new Date(1698105600000);
+// // console.log(d.toDateString())
 
+
+const date = new Date(1700784000000);
+console.log(date)

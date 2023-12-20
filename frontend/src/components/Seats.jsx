@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { RiRectangleFill } from "react-icons/ri";
 import SeatDetails from "./SeatDetails";
 
-const Seats = ({ bookedSeats }) => {
+const Seats = ({ bookedSeats, trip }) => {
   console.log("Booked seats:", bookedSeats);
 
   const L1 = ["l11", "l12", "l13", "l14", "l15", "l16", "l17"];
@@ -63,7 +63,7 @@ const Seats = ({ bookedSeats }) => {
           *You can't select 5 seats at a time
         </p>
       </div>
-      <SeatDetails yourbookedSeats={yourbookedSeats} />
+      <SeatDetails yourbookedSeats={yourbookedSeats} trip={trip} />
     </div>
   );
 };

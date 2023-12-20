@@ -1,26 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { editFilter } from "../redux/actionCreators/filter";
+import { fetchTrips } from "../redux/actionCreators/trip";
 
-const Filters = ({ applyFilters }) => {
+const Filters = () => {
+  const dispatch = useDispatch();
+  const filter = useSelector((state) => state.filter);
   const [arrivalTime, setArrivalTime] = useState([]);
   const [departureTime, setDepartureTime] = useState([]);
-  const [rating, setRating] = useState('');
+  const [rating, setRating] = useState("");
   const [busOperator, setBusOperator] = useState([]);
 
   const handleApplyFilters = () => {
     const filters = {
-      arrivalTime,
-      departureTime,
+      arrivalSessions: arrivalTime,
+      departureSessions: departureTime,
       rating,
       busOperator,
     };
-    applyFilters(filters);
+    dispatch(editFilter(filters));
+    dispatch(fetchTrips());
+    console.log(filters);
+    console.log("filter", filter);
   };
 
   return (
     <div className="max-w-md mx-auto p-6 bg-white shadow-md rounded-xl overflow-hidden">
       <h2 className="text-2xl font-bold mb-4">Filters</h2>
       <div className="mb-4 flex flex-col space-y-4">
-        <div className='border-b pb-2'>
+        <div className="border-b pb-2">
           <h3 className="text-lg font-semibold mb-2">Arrival Time</h3>
           <div className="flex flex-col space-y-2">
             {/* Checkbox for Morning Session */}
@@ -28,12 +36,12 @@ const Filters = ({ applyFilters }) => {
               <input
                 type="checkbox"
                 value="morning"
-                checked={arrivalTime.includes('morning')}
+                checked={arrivalTime.includes("morning")}
                 onChange={() =>
                   setArrivalTime((prev) =>
-                    prev.includes('morning')
-                      ? prev.filter((time) => time !== 'morning')
-                      : [...prev, 'morning']
+                    prev.includes("morning")
+                      ? prev.filter((time) => time !== "morning")
+                      : [...prev, "morning"]
                   )
                 }
                 className="form-checkbox h-4 w-4 text-blue-500"
@@ -45,12 +53,12 @@ const Filters = ({ applyFilters }) => {
               <input
                 type="checkbox"
                 value="afternoon"
-                checked={arrivalTime.includes('afternoon')}
+                checked={arrivalTime.includes("afternoon")}
                 onChange={() =>
                   setArrivalTime((prev) =>
-                    prev.includes('afternoon')
-                      ? prev.filter((time) => time !== 'afternoon')
-                      : [...prev, 'afternoon']
+                    prev.includes("afternoon")
+                      ? prev.filter((time) => time !== "afternoon")
+                      : [...prev, "afternoon"]
                   )
                 }
                 className="form-checkbox h-4 w-4 text-blue-500"
@@ -62,12 +70,12 @@ const Filters = ({ applyFilters }) => {
               <input
                 type="checkbox"
                 value="evening"
-                checked={arrivalTime.includes('evening')}
+                checked={arrivalTime.includes("evening")}
                 onChange={() =>
                   setArrivalTime((prev) =>
-                    prev.includes('evening')
-                      ? prev.filter((time) => time !== 'evening')
-                      : [...prev, 'evening']
+                    prev.includes("evening")
+                      ? prev.filter((time) => time !== "evening")
+                      : [...prev, "evening"]
                   )
                 }
                 className="form-checkbox h-4 w-4 text-blue-500"
@@ -84,12 +92,12 @@ const Filters = ({ applyFilters }) => {
               <input
                 type="checkbox"
                 value="morning"
-                checked={departureTime.includes('morning')}
+                checked={departureTime.includes("morning")}
                 onChange={() =>
                   setDepartureTime((prev) =>
-                    prev.includes('morning')
-                      ? prev.filter((time) => time !== 'morning')
-                      : [...prev, 'morning']
+                    prev.includes("morning")
+                      ? prev.filter((time) => time !== "morning")
+                      : [...prev, "morning"]
                   )
                 }
                 className="form-checkbox h-4 w-4 text-blue-500"
@@ -101,12 +109,12 @@ const Filters = ({ applyFilters }) => {
               <input
                 type="checkbox"
                 value="afternoon"
-                checked={departureTime.includes('afternoon')}
+                checked={departureTime.includes("afternoon")}
                 onChange={() =>
                   setDepartureTime((prev) =>
-                    prev.includes('afternoon')
-                      ? prev.filter((time) => time !== 'afternoon')
-                      : [...prev, 'afternoon']
+                    prev.includes("afternoon")
+                      ? prev.filter((time) => time !== "afternoon")
+                      : [...prev, "afternoon"]
                   )
                 }
                 className="form-checkbox h-4 w-4 text-blue-500"
@@ -118,12 +126,12 @@ const Filters = ({ applyFilters }) => {
               <input
                 type="checkbox"
                 value="evening"
-                checked={departureTime.includes('evening')}
+                checked={departureTime.includes("evening")}
                 onChange={() =>
                   setDepartureTime((prev) =>
-                    prev.includes('evening')
-                      ? prev.filter((time) => time !== 'evening')
-                      : [...prev, 'evening']
+                    prev.includes("evening")
+                      ? prev.filter((time) => time !== "evening")
+                      : [...prev, "evening"]
                   )
                 }
                 className="form-checkbox h-4 w-4 text-blue-500"
@@ -139,9 +147,9 @@ const Filters = ({ applyFilters }) => {
             <label className="flex items-center">
               <input
                 type="radio"
-                value="0-2"
-                checked={rating === '0-2'}
-                onChange={() => setRating('0-2')}
+                value={0}
+                checked={rating === 0}
+                onChange={() => setRating(0)}
                 className="form-radio h-4 w-4 text-blue-500"
               />
               <span className="ml-2">0-2</span>
@@ -150,9 +158,9 @@ const Filters = ({ applyFilters }) => {
             <label className="flex items-center">
               <input
                 type="radio"
-                value="2-4"
-                checked={rating === '2-4'}
-                onChange={() => setRating('2-4')}
+                value={2}
+                checked={rating === 2}
+                onChange={() => setRating(2)}
                 className="form-radio h-4 w-4 text-blue-500"
               />
               <span className="ml-2">2-4</span>
@@ -161,9 +169,9 @@ const Filters = ({ applyFilters }) => {
             <label className="flex items-center">
               <input
                 type="radio"
-                value="4+"
-                checked={rating === '4+'}
-                onChange={() => setRating('4+')}
+                value={4}
+                checked={rating === 4}
+                onChange={() => setRating(4)}
                 className="form-radio h-4 w-4 text-blue-500"
               />
               <span className="ml-2">4+</span>
@@ -178,12 +186,12 @@ const Filters = ({ applyFilters }) => {
               <input
                 type="checkbox"
                 value="tataMotors"
-                checked={busOperator.includes('tataMotors')}
+                checked={busOperator.includes("tataMotors")}
                 onChange={() =>
                   setBusOperator((prev) =>
-                    prev.includes('tataMotors')
-                      ? prev.filter((operator) => operator !== 'tataMotors')
-                      : [...prev, 'tataMotors']
+                    prev.includes("tataMotors")
+                      ? prev.filter((operator) => operator !== "tataMotors")
+                      : [...prev, "tataMotors"]
                   )
                 }
                 className="form-checkbox h-4 w-4 text-blue-500"
@@ -195,12 +203,14 @@ const Filters = ({ applyFilters }) => {
               <input
                 type="checkbox"
                 value="relianceTourism"
-                checked={busOperator.includes('relianceTourism')}
+                checked={busOperator.includes("relianceTourism")}
                 onChange={() =>
                   setBusOperator((prev) =>
-                    prev.includes('relianceTourism')
-                      ? prev.filter((operator) => operator !== 'relianceTourism')
-                      : [...prev, 'relianceTourism']
+                    prev.includes("relianceTourism")
+                      ? prev.filter(
+                          (operator) => operator !== "relianceTourism"
+                        )
+                      : [...prev, "relianceTourism"]
                   )
                 }
                 className="form-checkbox h-4 w-4 text-blue-500"
@@ -212,12 +222,12 @@ const Filters = ({ applyFilters }) => {
               <input
                 type="checkbox"
                 value="nitaTravels"
-                checked={busOperator.includes('nitaTravels')}
+                checked={busOperator.includes("nitaTravels")}
                 onChange={() =>
                   setBusOperator((prev) =>
-                    prev.includes('nitaTravels')
-                      ? prev.filter((operator) => operator !== 'nitaTravels')
-                      : [...prev, 'nitaTravels']
+                    prev.includes("nitaTravels")
+                      ? prev.filter((operator) => operator !== "nitaTravels")
+                      : [...prev, "nitaTravels"]
                   )
                 }
                 className="form-checkbox h-4 w-4 text-blue-500"

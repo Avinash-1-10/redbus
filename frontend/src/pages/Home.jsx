@@ -1,13 +1,13 @@
 import React from "react";
-import Navbar from "../components/Navbar";
 import Hero from "../components/Hero";
 import PopularDestinations from "../components/PopularDestinations";
 
-const Home = ({ setFilters }) => {
+const Home = () => {
+  
   return (
     <div>
-      <Hero setFilters={setFilters} />
-      <PopularDestinations/>
+      <Hero/>
+      <PopularDestinations />
     </div>
   );
 };
