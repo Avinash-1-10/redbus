@@ -80,102 +80,100 @@ const SearchTrip = ({ setFilters }) => {
     setCalendarVisible(false);
   };
 
+  
+
   return (
-    <div className="border max-w-fit h-auto md:h-[60px] my-5 rounded-lg flex flex-col md:flex-row justify-between items-center p-5 md:p-10 shadow-lg bg-white gap-5 relative">
-      <div className="flex flex-col md:flex-row gap-5">
-        <input
-          type="text"
-          className="border w-full md:w-[200px] h-[45px] md:h-[45px] pl-2 rounded-md outline-none"
-          placeholder="Where from?"
-          value={from}
-          onChange={(e) => {
-            setFrom(e.target.value);
-            handleInputChange(
-              e.target.value,
-              setFromSuggestions,
-              setFromSuggestionsVisible
-            );
-          }}
-          onBlur={() => setFromSuggestionsVisible(false)}
-        />
-        {fromSuggestionsVisible && fromSuggestions.length > 0 && (
-          <div className="absolute md:static top-[70px] flex flex-col gap-3 border bg-white w-full md:w-[200px] p-5 max-h-[250px] md:max-h-[250px] overflow-scroll rounded-md">
-            {fromSuggestions.map((suggestion, index) => (
-              <span
-                key={index}
-                onMouseDown={(e) => {
-                  e.preventDefault();
-                  handleSuggestionClick(
-                    suggestion,
-                    setFrom,
-                    setFromSuggestions,
-                    setFromSuggestionsVisible
-                  );
-                }}
-                className="cursor-pointer"
-              >
-                {suggestion}
-              </span>
-            ))}
-          </div>
-        )}
-      </div>
-      <FaArrowRight className="text-blue-500 text-[20px] md:mx-5" />
-      <div className="flex flex-col md:flex-row gap-5">
-        <input
-          type="text"
-          className="border w-full md:w-[200px] h-[45px] md:h-[45px] pl-2 rounded-md outline-none"
-          placeholder="Where to?"
-          value={to}
-          onChange={(e) => {
-            setTo(e.target.value);
-            handleInputChange(
-              e.target.value,
-              setToSuggestions,
-              setToSuggestionsVisible
-            );
-          }}
-          onBlur={() => setToSuggestionsVisible(false)}
-        />
-        {toSuggestionsVisible && toSuggestions.length > 0 && (
-          <div className="absolute md:static top-[70px] md:left-[340px] flex flex-col gap-3 border bg-white w-full md:w-[200px] p-5 max-h-[250px] md:max-h-[250px] overflow-scroll rounded-md">
-            {toSuggestions.map((suggestion, index) => (
-              <span
-                key={index}
-                onMouseDown={(e) => {
-                  e.preventDefault();
-                  handleSuggestionClick(
-                    suggestion,
-                    setTo,
-                    setToSuggestions,
-                    setToSuggestionsVisible
-                  );
-                }}
-                className="cursor-pointer"
-              >
-                {suggestion}
-              </span>
-            ))}
-          </div>
-        )}
-      </div>
-      <div className="border flex h-[45px] items-center gap-2 md:pl-2 rounded-md w-full md:w-[150px] relative">
+    <div className="border max-w-fit h-[60px] my-5 rounded-lg flex justify-between items-center p-10 shadow-lg bg-white gap-10 relative">
+      <input
+        type="text"
+        className="border w-[200px] h-[45px] pl-2 rounded-md outline-none"
+        placeholder="Where from?"
+        value={from}
+        onChange={(e) => {
+          setFrom(e.target.value);
+          handleInputChange(
+            e.target.value,
+            setFromSuggestions,
+            setFromSuggestionsVisible
+          );
+        }}
+        onBlur={() => setFromSuggestionsVisible(false)}
+      />
+      {fromSuggestionsVisible && fromSuggestions.length > 0 && (
+        <div className="absolute top-[70px] flex flex-col gap-3 border bg-white w-[200px] p-5 max-h-[250px] overflow-scroll rounded-md">
+          {fromSuggestions.map((suggestion, index) => (
+            <span
+              key={index}
+              onMouseDown={(e) => {
+                e.preventDefault();
+                handleSuggestionClick(
+                  suggestion,
+                  setFrom,
+                  setFromSuggestions,
+                  setFromSuggestionsVisible
+                );
+              }}
+              className="cursor-pointer"
+            >
+              {suggestion}
+            </span>
+          ))}
+        </div>
+      )}
+      <FaArrowRight className="text-blue-500 text-[20px]" />
+      <input
+        type="text"
+        className="border w-[200px] h-[45px] pl-2 rounded-md outline-none"
+        placeholder="Where to?"
+        value={to}
+        onChange={(e) => {
+          setTo(e.target.value);
+          handleInputChange(
+            e.target.value,
+            setToSuggestions,
+            setToSuggestionsVisible
+          );
+        }}
+        onBlur={() => setToSuggestionsVisible(false)}
+      />
+      {toSuggestionsVisible && toSuggestions.length > 0 && (
+        <div className="absolute top-[70px] left-[340px] flex flex-col gap-3 border bg-white w-[200px] p-5 max-h-[250px] overflow-scroll rounded-md">
+          {toSuggestions.map((suggestion, index) => (
+            <span
+              key={index}
+              onMouseDown={(e) => {
+                e.preventDefault();
+                handleSuggestionClick(
+                  suggestion,
+                  setTo,
+                  setToSuggestions,
+                  setToSuggestionsVisible
+                );
+              }}
+              className="cursor-pointer"
+            >
+              {suggestion}
+            </span>
+          ))}
+        </div>
+      )}
+      <div className="border flex h-[45px] items-center gap-2 pl-2 rounded-md w-[150px] relative">
         <BsCalendar
           className="text-[25px] cursor-pointer"
           onClick={() => setCalendarVisible(!calendarVisible)}
         />
         <span>{date}</span>
         {calendarVisible && (
-          <div className="absolute top-[50px] md:right-0">
+          <div className="absolute top-[50px] rigt-0">
             <Calendar
               onChange={handleCalendarChange}
-              value={new Date(date)}
+              value={date}
               style={{ width: "250px" }}
             />
           </div>
         )}
       </div>
-      <div className="border p-2 bg-blue-500 rounded-lg md:ml-2">
+      <div className="border p-2 bg-blue-500 rounded-lg">
         <BsSearch
           className="text-[25px] text-white cursor-pointer"
           onClick={handleSearch}
@@ -186,4 +184,3 @@ const SearchTrip = ({ setFilters }) => {
 };
 
 export default SearchTrip;
-
