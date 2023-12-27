@@ -1,134 +1,67 @@
-// db.bus_owner.insertMany([
-//     {
-//       "name": "IntrCity Smart Bus",
-//       "category": "A/C Sleeper (2+1)",
-//       "totalSeats": 38,
-//       "rating": 4.5,
-//       "animeties": ["Live Tracking", "Policies", "Photos", "Amenities", "Reviews"],
-//       "bus_no": "INCB001"
-//     },
-//     {
-//       "name": "Tata Motors - Marcopolo",
-//       "category": "A/C Sleeper (2+1)",
-//       "totalSeats": 38,
-//       "totalWindowSeatsAvailable": 24,
-//       "rating": 4.7,
-//       "animeties": ["Live Tracking", "Policies", "Photos", "Amenities", "Reviews"],
-//       "bus_no": "TMMC002"
-//     },
-//     {
-//       "name": "Eicher Motors",
-//       "category": "A/C Sleeper (2+1)",
-//       "totalSeats": 38,
-//       "totalWindowSeatsAvailable": 24,
-//       "rating": 4.5,
-//       "animeties": ["Live Tracking", "Policies", "Photos", "Amenities", "Reviews"],
-//       "bus_no": "EMAC003"
-//     },
-//     {
-//       "name": "BharatBenz",
-//       "category": "A/C Sleeper (2+1)",
-//       "totalSeats": 38,
-//       "totalWindowSeatsAvailable": 24,
-//       "rating": 4.5,
-//       "animeties": ["Live Tracking", "Policies", "Photos", "Amenities", "Reviews"],
-//       "bus_no": "BBAC004"
-//     },
-//     {
-//       "name": "Volvo Buses",
-//       "category": "A/C Sleeper (2+1)",
-//       "totalSeats": 38,
-//       "totalWindowSeatsAvailable": 24,
-//       "rating": 4.5,
-//       "animeties": ["Live Tracking", "Policies", "Photos", "Amenities", "Reviews"],
-//       "bus_no": "VOL005"
-//     },
-//     {
-//       "name": "Mahindra & Mahindra",
-//       "category": "A/C Sleeper (2+1)",
-//       "totalSeats": 38,
-//       "totalWindowSeatsAvailable": 24,
-//       "rating": 4.5,
-//       "animeties": ["Live Tracking", "Policies", "Photos", "Amenities", "Reviews"],
-//       "bus_no": "M&M006"
-//     },
-//     {
-//       "name": "Ashok Leyland",
-//       "category": "A/C Sleeper (2+1)",
-//       "totalSeats": 38,
-//       "totalWindowSeatsAvailable": 24,
-//       "rating": 4.5,
-//       "animeties": ["Live Tracking", "Policies", "Photos", "Amenities", "Reviews"],
-//       "bus_no": "AL007"
-//     },
-//     {
-//       "name": "Jabbar Travels",
-//       "category": "A/C Sleeper (2+1)",
-//       "totalSeats": 38,
-//       "totalWindowSeatsAvailable": 24,
-//       "rating": 4.5,
-//       "animeties": ["Live Tracking", "Policies", "Photos", "Amenities", "Reviews"],
-//       "bus_no": "JT008"
-//     },
-//     {
-//       "name": "Jeppiaar Travels",
-//       "category": "A/C Sleeper (2+1)",
-//       "totalSeats": 38,
-//       "totalWindowSeatsAvailable": 24,
-//       "rating": 4.5,
-//       "animeties": ["Live Tracking", "Policies", "Photos", "Amenities", "Reviews"],
-//       "bus_no": "JPT009"
-//     },
-//     {
-//       "name": "Neeta Travels",
-//       "category": "A/C Sleeper (2+1)",
-//       "totalSeats": 38,
-//       "totalWindowSeatsAvailable": 24,
-//       "rating": 4.5,
-//       "animeties": ["Live Tracking", "Policies", "Photos", "Amenities", "Reviews"],
-//       "bus_no": "NT010"
-//     },
-//   ]);
+app.post("/redbus/create-checkout-session", async (req, res) => {
+    const { trip } = req.body;
+    console.log("fare", trip);
+    const lineItems = [
+      {
+        price_data: {
+          currency: "inr",
+          product_data: {
+            name: trip.busOperator,
+          },
+          unit_amount: trip.busFare * 100,
+        },
+        quantity: trip.tobookSeat.length,
+      },
+    ];
   
-// // console.log(Date.parse("01-11-2023"))
-// // const dat1 = new Date(2023, 11, 2, 15, 30, 0, 0);
-// // console.log(dat1)
-// const date = new Date(1701511200000)
-// console.log(date.toLocaleDateString())
-
-// // console.log(date.toLocaleDateString("ind"))
-// // console.log(date.toLocaleTimeString());
-
-
-// const ticket = {
-//     name:"Avinash Yede",
-//     gender:"Male",
-//     age: 22,
-//     email: "avinash@gmail.com",
-//     phone: 1234567890,
-//     trip: "trip id",
-//     from: "Mumbai",
-//     to:"Pune",
-//     busFare: 2000,
-//     busOwnerID: "655873d382bbcf6e6a2f8da9",
-//     startTime: 122323230000,
-//     endTime: 120000000000,
-// }
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      line_items: lineItems,
+      mode: "payment",
+      success_url: "http://localhost:3000/success",
+      cancel_url: "http://localhost:3000/cancel",
+    });
+  
+    res.json({ id: session.id });
+  });
 
 
-// Specify the date in the format "YYYY-MM-DD"
-// const dateString = "2023-11-2";
+  //
+  async function makePayment() {
+    handleSubmit();
+    const stripe = await loadStripe(
+      "pk_test_51OJIGgSC5FgsqqSXwOAajJy83RYGnRT5oqNVYFYe8LMed1vjgj13PmzXzSHko9UElrMfuuhfEl3H1ymyKTBxPgmt0000fOrYZc"
+    );
+    const body = {
+      trip: data,
+    };
 
-// // Get the timestamp for the specified date
-// const timestamp = Date.parse(dateString);
+    const header = {
+      "Content-Type": "application/json",
+    };
 
-// console.log(timestamp);
-// const date = new Date(1700784000000)
-// console.log(date.toLocaleDateString("ind"))
-// // let d = new Date(1698105600000);
-// // let d1 = new Date(1698105600000);
-// // console.log(d.toDateString())
+    const response = await fetch(
+      "http://localhost:8080/redbus/create-checkout-session",
+      {
+        method: "POST",
+        headers: header,
+        body: JSON.stringify(body),
+      }
+    );
 
+    const session = await response.json();
+    console.log("36");
+    const result = stripe.redirectToCheckout({
+      sessionId: session.id,
+    });
 
-const date = new Date(1700784000000);
-console.log(date)
+    console.log("41");
+
+    console.log("44");
+    if (result.error) {
+      console.log(result.error);
+    }
+
+    // Resolve the promise once the payment process is completed
+    return result;
+  }

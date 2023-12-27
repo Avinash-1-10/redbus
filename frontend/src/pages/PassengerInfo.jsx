@@ -47,45 +47,81 @@ const PassengerInfo = () => {
     setPassengerData(updatedPassengerData);
   };
 
-  const makePayment = async () => {
+  // const makePayment = async () => {
+  //   dispatch(addTicket({ totalPrice, passengerInfo: passengerData }));
+
+  //   try {
+  //     const stripe = await loadStripe(
+  //       "pk_test_51OImwQSBthM8UWJybUFRcAkPAk2xLFXlGKHSAMgnfmlu7KgXgfqPyKCty2muRwFbAFyPpHLwNniIZK45yqkVhjZn00qyBFFOqY"
+  //     );
+
+  //     if (!stripe) {
+  //       console.error("Stripe is not loaded properly");
+  //       return;
+  //     }
+
+  //     const body = {
+  //       totalPrice: ticket.totalPrice,
+  //       from,
+  //       to,
+  //       success: `${baseUrl}/success`,
+  //       fail: `${baseUrl}/fail`,
+  //     };
+
+  //     const response = await axios.post(
+  //       "http://localhost:4000/api/payment/create-checkout-session",
+  //       body
+  //     );
+
+  //     const session = response.data;
+
+  //     const result = await stripe.redirectToCheckout({
+  //       sessionId: session.id,
+  //     });
+
+  //     if (result.error) {
+  //       console.log(result.error);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error during payment:", error);
+  //   }
+  // };
+
+  async function makePayment() {
     dispatch(addTicket({ totalPrice, passengerInfo: passengerData }));
+    const stripe = await loadStripe(
+      "pk_test_51OImwQSBthM8UWJybUFRcAkPAk2xLFXlGKHSAMgnfmlu7KgXgfqPyKCty2muRwFbAFyPpHLwNniIZK45yqkVhjZn00qyBFFOqY"
+    );
+    const body = {
+      fromTo: `${from} to ${to}`,
+      total: 1,
+      busFare: ticket.totalPrice,
+      success: `${baseUrl}/success`,
+      fail: `${baseUrl}/fail`,
+    };
 
-    try {
-      const stripe = await loadStripe(
-        "pk_test_51OImwQSBthM8UWJybUFRcAkPAk2xLFXlGKHSAMgnfmlu7KgXgfqPyKCty2muRwFbAFyPpHLwNniIZK45yqkVhjZn00qyBFFOqY"
-      );
+    const header = {
+      "Content-Type": "application/json",
+    };
 
-      if (!stripe) {
-        console.error("Stripe is not loaded properly");
-        return;
+    const response = await fetch(
+      "http://localhost:4000/redbus/create-checkout-session",
+      {
+        method: "POST",
+        headers: header,
+        body: JSON.stringify(body),
       }
+    );
 
-      const body = {
-        totalPrice: ticket.totalPrice,
-        from,
-        to,
-        success: `${baseUrl}/success`,
-        fail: `${baseUrl}/fail`,
-      };
-
-      const response = await axios.post(
-        "http://localhost:4000/api/payment/create-checkout-session",
-        body
-      );
-
-      const session = response.data;
-
-      const result = await stripe.redirectToCheckout({
-        sessionId: session.id,
-      });
-
-      if (result.error) {
-        console.log(result.error);
-      }
-    } catch (error) {
-      console.error("Error during payment:", error);
+    const session = await response.json();
+    const result = stripe.redirectToCheckout({
+      sessionId: session.id,
+    });
+    if (result.error) {
+      console.log(result.error);
     }
-  };
+    return result;
+  }
   return (
     <div className="flex justify-between p-4 bg-gray-100 w-full px-20">
       {/* Passenger details */}
